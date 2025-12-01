@@ -423,9 +423,8 @@ export default function OrderPage() {
           },
         ]);
       }
-      setSelectedItem("");
       setQuantity(1);
-      showAlert("Item added to cart", "success");
+      // showAlert("", "success");
     }
   };
 
@@ -632,7 +631,7 @@ export default function OrderPage() {
                     Total Items
                   </label>
                   <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-amber-300 dark:border-yellow-600 text-amber-900 text-yellow-200 font-semibold">
-                    <span id="total-items">{totalItems}</span> items
+                    <span id="total-items" className="font-[var(--font-mono)]">{totalItems}</span> items
                   </div>
                 </div>
               </div>
@@ -820,7 +819,7 @@ export default function OrderPage() {
                 </span>
                 <strong
                   id="totalAmount"
-                  className="text-base sm:text-2xl bg-gradient-to-br from-amber-600 to-yellow-500 bg-clip-text text-transparent"
+                  className="text-base sm:text-2xl bg-gradient-to-br from-amber-600 to-yellow-500 bg-clip-text text-transparent font-[var(--font-mono)]"
                 >
                   ${totalAmount.toFixed(2)}
                 </strong>

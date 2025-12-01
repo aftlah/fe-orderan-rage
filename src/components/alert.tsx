@@ -19,7 +19,7 @@ export function Alert({ message, type = "info" }: AlertProps) {
     }
   }, [message]);
 
-  if (!visible) return null;
+  if (!visible || !message) return null;
 
   const bgColor =
     type === "success"
