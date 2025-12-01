@@ -123,6 +123,20 @@ export default function OrderPage() {
   const openAnnounceLock = useRef(new Set<string>());
   const closeAnnounceLock = useRef(new Set<string>());
 
+  const ITEM_MAX_LIMITS: Record<string, number> = useMemo(
+    () => ({
+      "PISTOL .50": 60,
+      "CERAMIC PISTOL": 30,
+      "MICRO SMG": 20,
+      "AMMO 9MM": 250,
+      "AMMO .50": 100,
+      VEST: 125,
+      "VEST MEDIUM": 150,
+      LOCKPICK: 60,
+    }),
+    []
+  );
+
   const showAlert = useCallback(
     (message: string, type: "success" | "error") => {
       setAlertMessage(message);
@@ -396,7 +410,7 @@ export default function OrderPage() {
 
   const handleAddItem = () => {
     if (!selectedItem || !selectedMemberId) {
-      showAlert("Please select member and item", "error");
+      showAlert("Pilih nama dan item terlebih dahulu", "error");
       return;
     }
 
@@ -450,18 +464,32 @@ export default function OrderPage() {
     }
 
     try {
+      const payload = {
+        memberId: Number(selectedMemberId),
+        orderanke: Number(orderankeValue) || undefined,
+        delivered: false,
+        items: cart.map((c) => ({
+          itemId: c.itemId,
+          itemName: c.itemName,
+          kategori: c.category,
+          harga: c.price,
+          qty: c.qty,
+          ...(ITEM_MAX_LIMITS[c.itemName] !== undefined
+            ? { maxQty: ITEM_MAX_LIMITS[c.itemName] }
+            : {}),
+        })),
+      };
+
       const response = await fetch(`${baseUrl}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },
-        body: JSON.stringify({
-          memberId: selectedMemberId,
-          items: cart,
-          total: totalAmount,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      console.log(JSON.stringify(payload));
 
       if (response.ok) {
         setCart([]);
@@ -631,7 +659,10 @@ export default function OrderPage() {
                     Total Items
                   </label>
                   <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-amber-300 dark:border-yellow-600 text-amber-900 text-yellow-200 font-semibold">
-                    <span id="total-items" className="font-[var(--font-mono)]">{totalItems}</span> items
+                    <span id="total-items" className="font-[var(--font-mono)]">
+                      {totalItems}
+                    </span>{" "}
+                    items
                   </div>
                 </div>
               </div>
@@ -855,7 +886,7 @@ export default function OrderPage() {
           {/* Your Orders (This Period) Section */}
           <div className="rounded-2xl bg-white dark:bg-[#1f1410] border border-[#f3e8d8] dark:border-[#3d342d] shadow-lg hover:shadow-xl transition p-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title text-xl font-bold flex items-center gap-3">
+              <h2 className="section-title text-xl font-bold flex items-center gap-3 text-yellow-100">
                 <span className="section-divider w-1 h-6 rounded-full bg-gradient-to-b from-amber-600 to-yellow-500"></span>
                 Your Orders (This Period)
               </h2>

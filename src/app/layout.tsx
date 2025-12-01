@@ -40,6 +40,7 @@ export default function RootLayout({
         style={{
           backgroundImage: "url('/images/foto_rage.png')",
           backgroundSize: "cover",
+          backgroundAttachment: "fixed",
         }}
       >
         <div className="fixed inset-0 bg-black/50 pointer-events-none z-0" />
