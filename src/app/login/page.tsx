@@ -3,12 +3,11 @@
 import type React from "react";
 
 import { useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,16 +19,23 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${baseUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      let data;
 
+      try {
+        data = await response.json();
+      } catch {
+        data = { message: await response.text() };
+      }
       if (!response.ok) {
-        setError(data.message || "Login failed");
+        setError(
+          response.status === 401 ? "Email atau password salah" : "Login gagal"
+        );
         setLoading(false);
         return;
       }
@@ -45,41 +51,11 @@ export default function LoginPage() {
 
   return (
     <>
-      <header className="bg-white dark:bg-[#1f1410] border-b border-[#f3e8d8] dark:border-[#3d342d] sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/images/logo_rage.png"
-              alt="R.A.G.E Logo"
-              width={48}
-              height={48}
-              className="w-12 h-12"
-            />
-            <div>
-              <h1 className="text-lg font-bold text-yellow-300">R.A.G.E</h1>
-              <p className="text-xs text-yellow-200/80">Admin Login</p>
-            </div>
-          </div>
-          <nav className="flex gap-2">
-            <Link
-              href="/"
-              className="px-3 py-2 rounded-lg border-2 border-amber-300 dark:border-yellow-600 text-amber-900 dark:text-yellow-200"
-            >
-              Order
-            </Link>
-            <Link
-              href="/dashboard"
-              className="px-3 py-2 rounded-lg border-2 border-amber-300 dark:border-yellow-600 text-amber-900 dark:text-yellow-200"
-            >
-              Dashboard
-            </Link>
-          </nav>
-        </div>
-      </header>
+      
 
       <main className="max-w-md mx-auto px-6 py-10 relative z-10">
-        <div className="rounded-2xl bg-white dark:bg-[#1f1410] border border-[#f3e8d8] dark:border-[#3d342d] shadow-lg p-8">
-          <h2 className="text-xl font-bold mb-6 text-[#1a1410] dark:text-[#fef3c7]">
+        <div className="rounded-2xl bg-white dark:bg-card border border-[#f3e8d8] dark:border-border shadow-lg p-8">
+          <h2 className="text-xl font-bold mb-6 text-[#1a1410] dark:text-primary">
             Masuk Admin
           </h2>
           {error && (
@@ -91,7 +67,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="email"
-                className="text-sm font-semibold text-[#1a1410] dark:text-[#fef3c7]"
+                className="text-sm font-semibold text-[#1a1410] dark:text-primary"
               >
                 Email
               </label>
@@ -102,13 +78,13 @@ export default function LoginPage() {
                 autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="px-4 py-3 rounded-lg bg-[#fffbf0] dark:bg-[#0a0805] border border-[#f3e8d8] dark:border-[#3d342d] text-[#1a1410] dark:text-[#fef3c7] focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="px-4 py-3 rounded-lg bg-[#fffbf0] dark:bg-input border border-[#f3e8d8] dark:border-border text-[#1a1410] dark:text-primary focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
             <div className="flex flex-col gap-2">
               <label
                 htmlFor="password"
-                className="text-sm font-semibold text-[#1a1410] dark:text-[#fef3c7]"
+                className="text-sm font-semibold text-[#1a1410] dark:text-primary"
               >
                 Password
               </label>
@@ -119,7 +95,7 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="px-4 py-3 rounded-lg bg-[#fffbf0] dark:bg-[#0a0805] border border-[#f3e8d8] dark:border-[#3d342d] text-[#1a1410] dark:text-[#fef3c7] focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="px-4 py-3 rounded-lg bg-[#fffbf0] dark:bg-input border border-[#f3e8d8] dark:border-border text-[#1a1410] dark:text-primary focus:outline-none focus:ring-2 focus:ring-amber-500"
               />
             </div>
             <button

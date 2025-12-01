@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/header";
 import { Alert } from "@/components/alert";
 
 interface Member {
@@ -30,6 +29,7 @@ interface OrderData {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const [loading, setLoading] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
   const [windows, setWindows] = useState<OrderWindow[]>([]);
@@ -47,30 +47,62 @@ export default function DashboardPage() {
   const [winMonth, setWinMonth] = useState("");
   const [winWeek, setWinWeek] = useState("");
 
-  useEffect(() => {
-    if (!localStorage.getItem("auth_token")) {
-      router.push("/login");
-    }
-    // fetchData(); // moved into useCallback below to avoid TDZ error
-  }, [router]);
-
-  
-
   const showAlert = (message: string, type: "success" | "error") => {
     setAlertMessage(message);
     setAlertType(type);
     setTimeout(() => setAlertMessage(""), 3000);
   };
 
+  useEffect(() => {
+    if (!localStorage.getItem("auth_token")) {
+      router.push("/login");
+      return;
+    }
+    (async () => {
+      try {
+        const [membersRes, windowsRes] = await Promise.all([
+          fetch(`${baseUrl}/api/members`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+            },
+          }),
+          fetch(`${baseUrl}/api/windows`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+            },
+          }),
+        ]);
+
+        if (membersRes.ok) {
+          const membersData = await membersRes.json();
+          setMembers(membersData);
+        }
+
+        if (windowsRes.ok) {
+          const windowsData = await windowsRes.json();
+          setWindows(windowsData);
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+        showAlert("Failed to load data", "error");
+        setLoading(false);
+      }
+    })();
+  }, [router, baseUrl]);
+
+  
+
   const fetchData = async () => {
     try {
       const [membersRes, windowsRes] = await Promise.all([
-        fetch("/api/members", {
+        fetch(`${baseUrl}/api/members`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
           },
         }),
-        fetch("/api/order-windows", {
+        fetch(`${baseUrl}/api/windows`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
           },
@@ -102,7 +134,7 @@ export default function DashboardPage() {
     }
 
     try {
-      const response = await fetch("/api/members", {
+      const response = await fetch(`${baseUrl}/api/members`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +164,7 @@ export default function DashboardPage() {
     }
 
     try {
-      const response = await fetch("/api/order-windows", {
+      const response = await fetch(`${baseUrl}/api/order-windows`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +195,7 @@ export default function DashboardPage() {
   };
 
   const filteredMembers = members.filter((m) =>
-    m.name.toLowerCase().includes(selectedName.toLowerCase())
+    (m?.name ?? "").toLowerCase().includes((selectedName ?? "").toLowerCase())
   );
 
   const months = Array.from({ length: 12 }, (_, i) => ({
@@ -184,7 +216,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Header />
       <Alert message={alertMessage} type={alertType} />
       <main className="max-w-6xl mx-auto px-6 py-8 relative z-10">
         {/* Dashboard Section */}
