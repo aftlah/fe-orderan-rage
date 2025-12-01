@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 const format = (date: Date, fmt: string): string => {
-  const pad = (n: number) => n.toString().padStart(2, '0');
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   return fmt
@@ -19,10 +19,12 @@ export function Header() {
       <div className="max-w-6xl mx-auto px-6 py-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img
-              src="/images/LOGO_RAGE.png"
+            <Image
+              src="/images/logo_rage.png"
               alt="R.A.G.E Logo"
-              className="w-14"
+              width={56}
+              height={56}
+              className="w-14 h-14"
             />
             <div className="brand-title">
               <h1>R.A.G.E</h1>
@@ -49,7 +51,7 @@ export function Header() {
                 localStorage.clear();
                 window.location.href = "/login";
               }}
-              className="px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-orange-600 text-white text-sm"
+              className="px-3 py-2 rounded-lg bg-linear-to-r from-red-600 to-orange-600 text-white text-sm"
             >
               Logout
             </button>

@@ -3,6 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -36,7 +37,7 @@ export default function LoginPage() {
       // Store token
       localStorage.setItem("auth_token", data.token);
       router.push("/dashboard");
-    } catch (err) {
+    } catch {
       setError("Network error");
       setLoading(false);
     }
@@ -47,10 +48,12 @@ export default function LoginPage() {
       <header className="bg-white dark:bg-[#1f1410] border-b border-[#f3e8d8] dark:border-[#3d342d] sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img
-              src="/images/LOGO_RAGE.png"
+            <Image
+              src="/images/logo_rage.png"
               alt="R.A.G.E Logo"
-              className="w-12"
+              width={48}
+              height={48}
+              className="w-12 h-12"
             />
             <div>
               <h1 className="text-lg font-bold text-yellow-300">R.A.G.E</h1>
@@ -122,7 +125,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 rounded-lg bg-gradient-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg disabled:opacity-50"
+              className="w-full px-6 py-3 rounded-lg bg-linear-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg disabled:opacity-50"
             >
               {loading ? "Logging in..." : "Login"}
             </button>

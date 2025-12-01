@@ -38,11 +38,7 @@ interface OrderWindow {
   status: string;
 }
 
-interface MyOrder {
-  itemName: string;
-  qty: number;
-  subtotal: number;
-}
+ 
 
 export default function OrderPage() {
   const router = useRouter();
@@ -50,7 +46,7 @@ export default function OrderPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [items, setItems] = useState<Item[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [selectedMember, setSelectedMember] = useState("");
+  
   const [selectedMemberId, setSelectedMemberId] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
@@ -58,7 +54,7 @@ export default function OrderPage() {
   const [loading, setLoading] = useState(true);
   const [orderNo, setOrderNo] = useState("");
   const [orderWindow, setOrderWindow] = useState<OrderWindow | null>(null);
-  const [myOrders, setMyOrders] = useState<MyOrder[]>([]);
+  
   const [memberFilteredName, setMemberFilteredName] = useState("");
   const [showMemberDropdown, setShowMemberDropdown] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -70,13 +66,9 @@ export default function OrderPage() {
       return;
     }
     // fetchData() is hoisted; safe to call here
-  }, []);
+  }, [router]);
 
-  const checkAuth = () => {
-    if (!localStorage.getItem("auth_token")) {
-      router.push("/login");
-    }
-  };
+  
 
   const fetchData = async () => {
     try {
@@ -202,7 +194,6 @@ export default function OrderPage() {
 
       if (response.ok) {
         setCart([]);
-        setSelectedMember("");
         setSelectedMemberId("");
         showAlert("Order submitted successfully", "success");
         fetchData();
@@ -217,7 +208,6 @@ export default function OrderPage() {
 
   const handleReset = () => {
     setCart([]);
-    setSelectedMember("");
     setSelectedMemberId("");
     setSelectedCategory("");
     setSelectedItem("");
@@ -248,7 +238,7 @@ export default function OrderPage() {
         {/* Order Form */}
         <div className="rounded-2xl bg-white dark:bg-[#1f1410] border border-[#f3e8d8] dark:border-[#3d342d] shadow-lg hover:shadow-xl transition p-8 mb-8">
           <h2 className="section-title text-xl font-bold mb-6 flex items-center gap-3">
-            <span className="section-divider w-1 h-6 rounded-full bg-gradient-to-b from-amber-600 to-yellow-500"></span>
+            <span className="section-divider w-1 h-6 rounded-full bg-linear-to-b from-amber-600 to-yellow-500"></span>
             Order Form
           </h2>
 
@@ -297,7 +287,6 @@ export default function OrderPage() {
                             key={m.id}
                             onClick={() => {
                               setMemberFilteredName(m.name);
-                              setSelectedMember(m.name);
                               setSelectedMemberId(m.id);
                               setShowMemberDropdown(false);
                             }}
@@ -332,7 +321,7 @@ export default function OrderPage() {
                 <label className="text-sm font-semibold text-slate-700 dark:text-yellow-200">
                   Total Items
                 </label>
-                <div className="px-4 py-3 rounded-lg bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-amber-300 dark:border-yellow-600 text-amber-900 dark:text-yellow-200 font-semibold">
+                <div className="px-4 py-3 rounded-lg bg-linear-to-r from-amber-100 to-yellow-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-amber-300 dark:border-yellow-600 text-amber-900 dark:text-yellow-200 font-semibold">
                   <span>{cart.reduce((sum, item) => sum + item.qty, 0)}</span>{" "}
                   items
                 </div>
@@ -398,7 +387,7 @@ export default function OrderPage() {
 
               <button
                 onClick={handleAddItem}
-                className="px-6 py-3 rounded-lg bg-gradient-to-r from-amber-600 to-yellow-500 text-[#1f1410] font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition"
+                className="px-6 py-3 rounded-lg bg-linear-to-r from-amber-600 to-yellow-500 text-[#1f1410] font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition"
               >
                 + Add
               </button>
@@ -409,7 +398,7 @@ export default function OrderPage() {
         {/* Order Summary */}
         <div className="rounded-2xl bg-white dark:bg-[#1f1410] border border-[#f3e8d8] dark:border-[#3d342d] shadow-lg hover:shadow-xl transition p-8">
           <h2 className="section-title text-xl font-bold mb-6 flex items-center gap-3">
-            <span className="section-divider w-1 h-6 rounded-full bg-gradient-to-b from-amber-600 to-yellow-500"></span>
+            <span className="section-divider w-1 h-6 rounded-full bg-linear-to-b from-amber-600 to-yellow-500"></span>
             Order Summary
           </h2>
 
@@ -498,11 +487,11 @@ export default function OrderPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between items-center p-4 sm:p-6 bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-yellow-900/40 dark:to-amber-900/40 rounded-xl border-2 border-amber-300 dark:border-yellow-600">
+            <div className="flex justify-between items-center p-4 sm:p-6 bg-linear-to-r from-amber-100 to-yellow-100 dark:from-yellow-900/40 dark:to-amber-900/40 rounded-xl border-2 border-amber-300 dark:border-yellow-600">
               <span className="text-base sm:text-lg font-bold text-slate-800 dark:text-yellow-100">
                 Total Price
               </span>
-              <strong className="text-base sm:text-2xl bg-gradient-to-br from-amber-600 to-yellow-500 bg-clip-text text-transparent">
+              <strong className="text-base sm:text-2xl bg-linear-to-br from-amber-600 to-yellow-500 bg-clip-text text-transparent">
                 ${totalAmount.toFixed(2)}
               </strong>
             </div>
@@ -511,7 +500,7 @@ export default function OrderPage() {
               <button
                 onClick={handleSubmitOrder}
                 disabled={cart.length === 0 || !selectedMemberId}
-                className="px-6 py-3 rounded-lg bg-gradient-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                className="px-6 py-3 rounded-lg bg-linear-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 Submit Order
               </button>

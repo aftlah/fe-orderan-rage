@@ -37,7 +37,7 @@ export default function DashboardPage() {
   const [selectedWeek, setSelectedWeek] = useState(1);
   const [selectedName, setSelectedName] = useState("");
   const [showNameDropdown, setShowNameDropdown] = useState(false);
-  const [dashboardData, setDashboardData] = useState<OrderData[]>([]);
+  const [dashboardData] = useState<OrderData[]>([]);
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [newMemberName, setNewMemberName] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -52,13 +52,9 @@ export default function DashboardPage() {
       router.push("/login");
     }
     // fetchData(); // moved into useCallback below to avoid TDZ error
-  }, []);
+  }, [router]);
 
-  const checkAuth = () => {
-    if (!localStorage.getItem("auth_token")) {
-      router.push("/login");
-    }
-  };
+  
 
   const showAlert = (message: string, type: "success" | "error") => {
     setAlertMessage(message);
@@ -195,7 +191,7 @@ export default function DashboardPage() {
         <div className="rounded-2xl bg-white dark:bg-[#1f1410] border border-[#f3e8d8] dark:border-[#3d342d] shadow-lg hover:shadow-xl transition p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="section-title text-xl font-bold flex items-center gap-3">
-              <span className="section-divider w-1 h-6 rounded-full bg-gradient-to-b from-amber-600 to-yellow-500"></span>
+              <span className="section-divider w-1 h-6 rounded-full bg-linear-to-b from-amber-600 to-yellow-500"></span>
               Dashboard
             </h2>
             <button
@@ -289,7 +285,7 @@ export default function DashboardPage() {
 
             <button
               onClick={() => fetchData()}
-              className="px-6 py-3 rounded-lg bg-gradient-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition text-sm sm:text-base"
+              className="px-6 py-3 rounded-lg bg-linear-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition text-sm sm:text-base"
             >
               Refresh
             </button>
@@ -348,7 +344,7 @@ export default function DashboardPage() {
         <div className="rounded-2xl bg-white dark:bg-[#1f1410] border border-[#f3e8d8] dark:border-[#3d342d] shadow-lg hover:shadow-xl transition p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="section-title text-xl font-bold flex items-center gap-3">
-              <span className="section-divider w-1 h-6 rounded-full bg-gradient-to-b from-amber-600 to-yellow-500"></span>
+              <span className="section-divider w-1 h-6 rounded-full bg-linear-to-b from-amber-600 to-yellow-500"></span>
               Order Schedule
             </h2>
             <div className="flex gap-3">
@@ -424,7 +420,7 @@ export default function DashboardPage() {
 
             <button
               onClick={handleCreateWindow}
-              className="px-6 py-3 rounded-lg bg-gradient-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition text-sm md:col-span-1"
+              className="px-6 py-3 rounded-lg bg-linear-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg hover:-translate-y-0.5 transition text-sm md:col-span-1"
             >
               Create
             </button>
@@ -519,7 +515,7 @@ export default function DashboardPage() {
               </button>
               <button
                 onClick={handleAddMember}
-                className="px-4 py-3 rounded-lg bg-gradient-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg transition"
+                className="px-4 py-3 rounded-lg bg-linear-to-r from-orange-700 to-amber-600 text-white font-semibold shadow hover:shadow-lg transition"
               >
                 Simpan
               </button>
