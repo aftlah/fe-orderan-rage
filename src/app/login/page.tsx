@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`,
+        `https://api-rage.aftlah.my.id/api/auth/login`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
