@@ -230,11 +230,8 @@ export default function OrderPage() {
         const msg = `@here\n# Open Order\nPeriode ${label}\nDibuka dari ${start} sampai ${end}\nSilakan submit sebelum tutup periode.`;
         await postToDiscord(msg);
         set.add(String(r.id));
-        try {
-          await fetch(`${baseUrl}/api/windows/${r.id}/announce-open`, {
-            method: "POST",
-          });
-        } catch {}
+        // Hanya GET status dari endpoint windows dan kirim ke Discord.
+        // Tidak perlu memanggil endpoint announce-open lagi.
         openAnnounceLock.current.delete(String(r.id));
       }
       try {
@@ -245,23 +242,10 @@ export default function OrderPage() {
 
   const expireOrderWindows = useCallback(async () => {
     try {
-      const now = getNowIso();
-      const res = await fetch(
-        `${baseUrl}/api/windows?active=1&end_lt=${encodeURIComponent(now)}`
-      );
+      const res = await fetch(`${baseUrl}/api/windows`);
       if (!res.ok) return;
       const data = await res.json();
       const rows: OrderWindowRow[] = Array.isArray(data) ? data : [];
-      const ids = rows.map((r) => r.id).filter(Boolean);
-      if (ids.length) {
-        try {
-          await fetch(`${baseUrl}/api/windows/expire`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids }),
-          });
-        } catch {}
-      }
       let announced: string[] = [];
       try {
         announced = JSON.parse(
@@ -271,6 +255,8 @@ export default function OrderPage() {
       const set = new Set<string>(announced);
       for (const r of rows) {
         if (!r || !r.id) continue;
+        // Hanya announce close jika window sudah tidak aktif dan belum ditandai announced_close
+        if (r.is_active === true) continue;
         if (r.announced_close === true) continue;
         if (set.has(String(r.id))) continue;
         if (closeAnnounceLock.current.has(String(r.id))) continue;
@@ -285,8 +271,14 @@ export default function OrderPage() {
         await postToDiscord(msg);
         set.add(String(r.id));
         try {
-          await fetch(`${baseUrl}/api/windows/${r.id}/announce-close`, {
-            method: "POST",
+          const token = localStorage.getItem("auth_token") || "";
+          await fetch(`${baseUrl}/api/windows/${r.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({ announced_close: true }),
           });
         } catch {}
         closeAnnounceLock.current.delete(String(r.id));
@@ -368,14 +360,10 @@ export default function OrderPage() {
   }, [baseUrl, CATALOG, showAlert, announceOpenedWindows, expireOrderWindows]);
 
   useEffect(() => {
-    if (!localStorage.getItem("auth_token")) {
-      router.push("/login");
-      return;
-    }
     startTransition(() => {
       fetchData();
     });
-  }, [router, fetchData]);
+  }, [fetchData]);
 
   const fetchMyOrders = async (memberId: string) => {
     if (!memberId) {

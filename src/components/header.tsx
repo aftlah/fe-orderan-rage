@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 const format = (date: Date, fmt: string): string => {
@@ -26,6 +28,14 @@ const format = (date: Date, fmt: string): string => {
 
 export function Header() {
   const today = new Date();
+  const pathname = usePathname();
+  const isLoggedIn = useMemo(() => {
+    try {
+      return !!localStorage.getItem("auth_token");
+    } catch {
+      return false;
+    }
+  }, [pathname]);
 
   return (
     <header className="bg-white dark:bg-card border-b border-[#f3e8d8] dark:border-border shadow sticky top-0 z-50">
@@ -33,7 +43,7 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
-              src={process.env.NEXT_PUBLIC_LOGO_PATH ?? "/images/LOGO_RAGE.png"}
+              src={"/images/logo_rage.png"}
               alt="R.A.G.E Logo"
               width={50}
               height={50}
@@ -61,15 +71,17 @@ export function Header() {
                 Dashboard
               </Link>
             </nav>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                window.location.href = "/login";
-              }}
-              className="px-3 py-2 rounded-lg bg-linear-to-r from-red-600 to-orange-600 text-white text-sm"
-            >
-              Logout
-            </button>
+            {isLoggedIn && (
+              <button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = "/login";
+                }}
+                className="px-3 py-2 rounded-lg bg-linear-to-r from-red-600 to-orange-600 text-white text-sm"
+              >
+                Logout
+              </button>
+            )}
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-slate-700 dark:text-yellow-300">
                 Today
