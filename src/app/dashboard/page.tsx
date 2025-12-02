@@ -186,15 +186,24 @@ export default function DashboardPage() {
       const params = new URLSearchParams();
       params.append("month", String(selectedMonth));
       params.append("week", String(selectedWeek));
-      if (selectedName) params.append("name", selectedName);
+
+      // console.log("Selected Month:", selectedMonth);
+      // console.log("Selected Week:", selectedWeek);
+      // console.log("Selected Name:", selectedName);
+      const nameParam = (selectedName || "").trim();
+      if (nameParam && nameParam.toLowerCase() !== "semua") {
+        params.append("name", nameParam);
+      }
       const res = await fetch(
-        `${baseUrl}/api/orders/details`,
+        `${baseUrl}/api/orders/details?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
           },
         }
       );
+
+      // console.log("Response:", res);
       if (!res.ok) throw new Error("Failed to fetch order details");
       const data = await res.json();
       setOrderDetails(Array.isArray(data) ? data : []);
