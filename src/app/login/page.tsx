@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,11 +18,14 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch(`${baseUrl}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       let data;
 
@@ -51,8 +53,6 @@ export default function LoginPage() {
 
   return (
     <>
-      
-
       <main className="max-w-md mx-auto px-6 py-10 relative z-10">
         <div className="rounded-2xl bg-white dark:bg-card border border-[#f3e8d8] dark:border-border shadow-lg p-8">
           <h2 className="text-xl font-bold mb-6 text-[#1a1410] dark:text-primary">
